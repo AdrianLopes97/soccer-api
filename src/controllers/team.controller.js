@@ -13,12 +13,12 @@ exports.create = (req, res) => {
     }
     
     // Create a Team
-    const Team = {
-    name: req.body.name,
+    const team = {
+        name: req.body.name,
     };
     
     // Save Team in the database
-    Team.create(Team)
+    Team.create(team)
     .then(data => {
         res.send(data);
     })
@@ -35,14 +35,14 @@ exports.findAll = (req, res) => {
     const name = req.query.name;
     var condition = name ? { name: { [Op.iLike]: `%${name}%` } } : null;
 
-    Tutorial.findAll({ where: condition })
+    Team.findAll({ where: condition })
     .then(data => {
         res.send(data);
     })
     .catch(err => {
         res.status(500).send({
         message:
-            err.message || "Some error occurred while retrieving tutorials."
+            err.message || "Some error occurred while retrieving Teams."
         });
     });
 };
@@ -51,19 +51,19 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    Tutorial.findByPk(id)
+    Team.findByPk(id)
     .then(data => {
         if (data) {
             res.send(data);
         } else {
             res.status(404).send({
-                message: `Cannot find Tutorial with id=${id}.`
+                message: `Cannot find Team with id=${id}.`
             });
         }
     })
     .catch(err => {
         res.status(500).send({
-            message: "Error retrieving Tutorial with id=" + id
+            message: "Error retrieving Team with id=" + id
         });
     });
 };
@@ -72,23 +72,23 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     const id = req.params.id;
 
-    Tutorial.update(req.body, {
+    Team.update(req.body, {
         where: { id: id }
     })
     .then(num => {
         if (num == 1) {
             res.send({
-                message: "Tutorial was updated successfully."
+                message: "Team was updated successfully."
             });
         } else {
             res.send({
-                message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found or req.body is empty!`
+                message: `Cannot update Team with id=${id}. Maybe Team was not found or req.body is empty!`
             });
         }
     })
     .catch(err => {
         res.status(500).send({
-            message: "Error updating Tutorial with id=" + id
+            message: "Error updating Team with id=" + id
         });
     });
 };
@@ -97,23 +97,23 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     const id = req.params.id;
 
-    Tutorial.destroy({
+    Team.destroy({
         where: { id: id }
     })
     .then(num => {
         if (num == 1) {
             res.send({
-                message: "Tutorial was deleted successfully!"
+                message: "Team was deleted successfully!"
             });
         } else {
             res.send({
-                message: `Cannot delete Tutorial with id=${id}. Maybe Tutorial was not found!`
+                message: `Cannot delete Team with id=${id}. Maybe Team was not found!`
             });
         }
     })
     .catch(err => {
         res.status(500).send({
-            message: "Could not delete Tutorial with id=" + id
+            message: "Could not delete Team with id=" + id
         });
     });
 };

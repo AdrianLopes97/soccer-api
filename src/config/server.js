@@ -2,7 +2,7 @@ const express = require("express");
 const apiConfig = require("./api.config");
 const db = require("../models/index.js");
 const app = express();
-require("../routes/team.routes")(app);
+
 
 const Start = () => {
     // parse requests of content-type - application/json
@@ -21,9 +21,9 @@ const Start = () => {
 
     // simple route
     app.get("/", (req, res) => {
-        res.json({ message: "Welcome to bezkoder application." });
+        res.json({ message: "Welcome to soccer application." });
     });
-
+    require("../routes/team.routes")(app);
     // set port, listen for requests
     app.listen(apiConfig.PORT, () => {
         console.log(`Server is running on port ${apiConfig.PORT}.`);
