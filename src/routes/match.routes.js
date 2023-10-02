@@ -14,6 +14,9 @@ module.exports = app => {
   
     // Update a Match with id
     router.put("/:id", matchs.update);
+
+    // Set goal a Match with id
+    router.put("/setGoal/:id", matchs.setGoal);
   
     // Delete a Match with id
     router.delete("/:id", matchs.delete);

@@ -117,3 +117,46 @@ exports.delete = (req, res) => {
         });
     });
 };
+
+// Find a single Match with an id
+exports.setGoal = (req, res) => {
+    const id = req.params.id;
+
+    Match.findByPk(id)
+    .then(data => {
+        if (data) {
+
+            data.dataValues.firstTeamGoals += req.body.firstTeamGoals;
+            data.dataValues.secondTeamGoals += req.body.secondTeamGoals;
+
+            Match.update(data.dataValues, {
+                where: { id: data.dataValues.id }
+            })
+            .then(num => {
+                if (num == 1) {
+                    res.send({
+                        message: "Match was updated successfully."
+                    });
+                } else {
+                    res.send({
+                        message: `Cannot update Match with id=${id}. Maybe Match was not found or req.body is empty!`
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message: "Error updating Match with id=" + id
+                });
+            });
+        } else {
+            res.status(404).send({
+                message: `Cannot find Match with id=${id}.`
+            });
+        }
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: "Error retrieving Match with id=" + id
+        });
+    });
+};
