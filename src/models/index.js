@@ -1,8 +1,6 @@
 const dbConfig = require("../config/db.config");
 const Sequelize = require("sequelize");
 
-console.log(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD);
-
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
@@ -21,6 +19,6 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-//db.tutorials = require("./tutorial.model.js")(sequelize, Sequelize);
+db.teams = require("./team/team.model")(sequelize, Sequelize);
 
 module.exports = db;

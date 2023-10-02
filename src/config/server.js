@@ -1,7 +1,8 @@
 const express = require("express");
 const apiConfig = require("./api.config");
-const db = require("../model/index.js");
+const db = require("../models/index.js");
 const app = express();
+require("../routes/team.routes")(app);
 
 const Start = () => {
     // parse requests of content-type - application/json
