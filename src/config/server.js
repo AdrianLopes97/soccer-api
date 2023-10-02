@@ -24,6 +24,7 @@ const Start = () => {
         res.json({ message: "Welcome to soccer application." });
     });
     require("../routes/team.routes")(app);
+    require("../routes/player.routes")(app);
     // set port, listen for requests
     app.listen(apiConfig.PORT, () => {
         console.log(`Server is running on port ${apiConfig.PORT}.`);
