@@ -1,6 +1,10 @@
 const db = require("../models");
 const Match = db.matchs;
 const Op = db.Sequelize.Op;
+const net = require('net');
+const apiConfig = require("../config/api.config");
+
+
 
 // Create and Save a new Match
 exports.create = (req, res) => {
@@ -118,8 +122,15 @@ exports.delete = (req, res) => {
     });
 };
 
-// Find a single Match with an id
+// set goal a single Match with an id
 exports.setGoal = (req, res) => {
+    // Estabeleça uma conexão com o servidor TCP
+    const client = net.createConnection({ host: apiConfig.TCP_HOST, port: apiConfig.TCP_PORT }, () => {
+        console.log('Conectado ao servidor TCP');
+        // Envie a mensagem para o servidor
+        client.write('Gol definido!');
+    });
+
     const id = req.params.id;
 
     Match.findByPk(id)
@@ -142,6 +153,8 @@ exports.setGoal = (req, res) => {
                         message: `Cannot update Match with id=${id}. Maybe Match was not found or req.body is empty!`
                     });
                 }
+                // Encerre a conexão com o servidor TCP após enviar a resposta
+                client.end();
             })
             .catch(err => {
                 res.status(500).send({
@@ -152,11 +165,15 @@ exports.setGoal = (req, res) => {
             res.status(404).send({
                 message: `Cannot find Match with id=${id}.`
             });
+            // Encerre a conexão com o servidor TCP após enviar a resposta
+            client.end();
         }
     })
     .catch(err => {
         res.status(500).send({
             message: "Error retrieving Match with id=" + id
         });
+        // Encerre a conexão com o servidor TCP após enviar a resposta
+        client.end();
     });
 };
