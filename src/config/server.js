@@ -2,17 +2,8 @@ const express = require("express");
 const apiConfig = require("./api.config");
 const db = require("../models/index.js");
 const app = express();
-const net = require('net');
 
-// Crie um servidor TCP
-const server = net.createServer();
-
-// Função para imprimir a mensagem no console
-function logGoal() {
-    console.log('Gol definido!');
-}
-
-const Start = () => {
+const start = () => {
     // parse requests of content-type - application/json
     app.use(express.json());
 
@@ -39,33 +30,42 @@ const Start = () => {
         console.log(`Server is running on port ${apiConfig.PORT}.`);
     });
 }
+const startSocket = () => {
+    const WebSocket = require('ws');
+    const server = new WebSocket.Server({ port: apiConfig.TCP_PORT });
 
-const StartTCP = () => {
-    // Configure o evento 'connection' para o servidor TCP
+    // Configure the 'connection' event for the TCP server
     server.on('connection', (socket) => {
-        console.log('Cliente conectado');
+        console.log('client connected');
 
-        // Monitorar evento 'data' para receber dados do cliente (você pode modificar esse trecho se necessário)
-        socket.on('data', (data) => {
-            console.log(`Dados recebidos do cliente: ${data}`);
+        socket.on('message', (data) => {
+            // Convert the hexadecimal message to a readable string
+            const message = data.toString('hex');
+            console.log(`encoded received message: ${message}`);
 
-            // Chame a função de logGoal toda vez que os dados forem recebidos
-            logGoal();
-        });
+            // Check if the message starts with 0x02 and ends with 0x64
+            if (message.startsWith('02') && message.endsWith('64')) {
+              // Remove message prefixes and suffixes
+              const payload = message.slice(2, -2);
+        
+              // Convert the payload to a human-readable string
+              const decodedPayload = Buffer.from(payload, 'hex').toString('utf8');
+        
+              console.log(`decoded received message: ${decodedPayload}`);
+            }
+          });
 
-        // Monitorar evento 'end' para saber quando o cliente se desconectou (opcional)
+        // Monitor 'end' event to know when the client disconnected (optional)
         socket.on('end', () => {
             console.log('Cliente desconectado');
         });
     });
-  
-    // Inicie o servidor na porta especificada
-    server.listen(apiConfig.TCP_PORT, apiConfig.TCP_HOST, () => {
-        console.log(`Servidor TCP rodando em ${apiConfig.TCP_HOST}:${apiConfig.TCP_PORT}`);
-    });
+
+    console.log('WebSocket server started');
 }
 
+
 module.exports = {
-    Start: Start(),
-    StartTCP : StartTCP()
+    Start: start(),
+    StartTCP : startSocket()
 };

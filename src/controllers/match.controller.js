@@ -1,7 +1,7 @@
 const db = require("../models");
 const Match = db.matchs;
 const Op = db.Sequelize.Op;
-const net = require('net');
+const WebSocket = require('ws');
 const apiConfig = require("../config/api.config");
 
 
@@ -124,12 +124,29 @@ exports.delete = (req, res) => {
 
 // set goal a single Match with an id
 exports.setGoal = (req, res) => {
-    // Estabeleça uma conexão com o servidor TCP
-    const client = net.createConnection({ host: apiConfig.TCP_HOST, port: apiConfig.TCP_PORT }, () => {
-        console.log('Conectado ao servidor TCP');
-        // Envie a mensagem para o servidor
-        client.write('Gol definido!');
-    });
+
+    const client = new WebSocket(`ws://${apiConfig.TCP_HOST}:${apiConfig.TCP_PORT}`);
+
+    client.on('open', () => {
+        console.log('Connected to server');
+      
+        // Convert message to hexadecimal
+        const payload = Buffer.from('GOOOOOOOOL', 'utf8').toString('hex');
+      
+        // Add prefix (0x02) and suffix (0x64) to message
+        const message = `02${payload}64`;
+      
+        // Send the message to the server
+        client.send(Buffer.from(message, 'hex'));
+      });
+      
+      client.on('message', (data) => {
+        console.log(`Server response: ${data}`);
+      });
+      
+      client.on('close', () => {
+        console.log('Disconnected from server');
+      });
 
     const id = req.params.id;
 
@@ -153,8 +170,6 @@ exports.setGoal = (req, res) => {
                         message: `Cannot update Match with id=${id}. Maybe Match was not found or req.body is empty!`
                     });
                 }
-                // Encerre a conexão com o servidor TCP após enviar a resposta
-                client.end();
             })
             .catch(err => {
                 res.status(500).send({
@@ -165,15 +180,11 @@ exports.setGoal = (req, res) => {
             res.status(404).send({
                 message: `Cannot find Match with id=${id}.`
             });
-            // Encerre a conexão com o servidor TCP após enviar a resposta
-            client.end();
         }
     })
     .catch(err => {
         res.status(500).send({
             message: "Error retrieving Match with id=" + id
         });
-        // Encerre a conexão com o servidor TCP após enviar a resposta
-        client.end();
     });
 };
